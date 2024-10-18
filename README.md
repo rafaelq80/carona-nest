@@ -6,6 +6,7 @@
     <img src="https://i.imgur.com/icgjsRQ.png" title="source: imgur.com" width="50%"/>
 </div>
 
+
 <br /><br />
 
 ## 1. O que é um Sistema de Caronas Compartilhadas?
@@ -112,8 +113,9 @@ Usuario --> Viagem
 
 
 <div align="center">
-    <img src="https://i.imgur.com/c6tmlGJ.png" title="source: imgur.com" />
+    <img src="https://i.imgur.com/TrhERFv.png" title="source: imgur.com" />
 </div>
+
 
 
 <br /><br />

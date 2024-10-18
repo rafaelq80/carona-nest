@@ -74,6 +74,12 @@ export class ViagemService {
 
   async update(viagem: Viagem): Promise<Viagem> {
     
+    if (!viagem.id)
+      throw new HttpException(
+        'A Viagem não foi encontrada!',
+        HttpStatus.NOT_FOUND,
+      );
+
     await this.findById(viagem.id);
 
     if (!viagem.veiculo)

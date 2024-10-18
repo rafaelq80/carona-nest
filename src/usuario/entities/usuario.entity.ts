@@ -36,6 +36,6 @@ export class Usuario {
 
     @OneToMany(() => Viagem, (viagem) => viagem.usuario)
     @ApiProperty() 
-    viagem: Viagem[]
+    viagem?: Viagem[]
 
 }
