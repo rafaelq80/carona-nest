@@ -1,53 +1,71 @@
-﻿import { ApiProperty } from "@nestjs/swagger";
-import { Transform, TransformFnParams } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsOptional, IsPositive } from "class-validator";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Usuario } from "../../usuario/entities/usuario.entity";
-import { NumericTransformer } from "../../util/numerictransformer";
-import { Veiculo } from "../../veiculo/entities/veiculo.entity";
+﻿import { ApiProperty } from '@nestjs/swagger';
+import { Transform, TransformFnParams } from 'class-transformer';
+import {
+    IsDateString,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsPositive,
+} from 'class-validator';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Usuario } from '../../usuario/entities/usuario.entity';
+import { NumericTransformer } from '../../util/numerictransformer';
 
-@Entity({name: "tb_viagens"}) 
-export class Viagem{
+@Entity({ name: 'tb_viagens' })
+export class Viagem {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn() 
-    id: number;
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @IsNotEmpty()
+  @Column({ length: 255, nullable: false })
+  @ApiProperty()
+  partida: string;
 
-    @Transform(({ value }: TransformFnParams) => value?.trim())
-    @IsNotEmpty() 
-    @Column({length: 255, nullable: false})
-    @ApiProperty() 
-    destino: string;
- 
-    @IsNumber({ maxDecimalPlaces: 2 })
-    @IsNotEmpty()
-    @Column({ type: "decimal", precision: 10, scale: 2, transformer: new NumericTransformer() })
-    valor: number
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @IsNotEmpty()
+  @Column({ length: 255, nullable: false })
+  @ApiProperty()
+  destino: string;
 
-    @IsPositive()
-    @Column({ type: "float", default: 1 })
-    distancia: number
+  @ApiProperty()
+  @IsDateString()
+  @Column({ type: 'datetime', nullable: false })
+  dataPartida: Date;
 
-    @IsPositive()
-    @Column({ type: "float", default: 1 })
-    velocidadeMedia: number
+  @ApiProperty()
+  @IsDateString()
+  @Column({ type: 'datetime', nullable: false })
+  dataChegada: Date;
 
-    @Transform(({ value }: TransformFnParams) => value?.trim())
-    @IsNotEmpty() 
-    @IsOptional()
-    @Column({length: 255, nullable: false})
-    @ApiProperty() 
-    tempoEstimado: string;
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsNotEmpty()
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: new NumericTransformer(),
+  })
+  valor: number;
 
-    @ManyToOne(() => Veiculo, (veiculo) => veiculo.viagem, {
-        onDelete: "CASCADE"
-    })
-    @ApiProperty({ type: () => Veiculo }) 
-    veiculo: Veiculo;
+  @IsPositive()
+  @Column({ type: 'float', default: 1 })
+  distancia: number;
 
-    @ManyToOne(() => Usuario, (usuario) => usuario.viagem, {
-        onDelete: "CASCADE"
-    })
-    @ApiProperty({ type: () => Usuario }) 
-    usuario: Usuario;
+  @IsPositive()
+  @Column({ type: 'float', default: 1 })
+  velocidadeMedia: number;
+
+  @Transform(({ value }: TransformFnParams) => value?.trim())
+  @IsNotEmpty()
+  @IsOptional()
+  @Column({ length: 255, nullable: false })
+  @ApiProperty()
+  tempoEstimado: string;
+
+  @ManyToOne(() => Usuario, (usuario) => usuario.viagem, {
+    onDelete: 'CASCADE',
+  })
+  @ApiProperty({ type: () => Usuario })
+  usuario: Usuario;
 }
-

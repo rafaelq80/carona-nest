@@ -3,6 +3,7 @@ import { Transform, TransformFnParams } from "class-transformer"
 import { IsEmail, IsNotEmpty, MinLength } from "class-validator"
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { Viagem } from "../../viagem/entities/viagem.entity"
+import { Veiculo } from "../../veiculo/entities/veiculo.entity"
 
 @Entity({name: "tb_usuarios"})
 export class Usuario {
@@ -30,12 +31,22 @@ export class Usuario {
     @ApiProperty() 
     senha: string
 
+    @Transform(({ value }: TransformFnParams) => value?.trim())
+    @IsNotEmpty()
+    @Column({ length: 255, nullable: false })
+    @ApiProperty()
+    celular: string;
+
     @Column({length: 5000 }) 
     @ApiProperty() 
     foto: string
 
+    @OneToMany(() => Veiculo, (veiculo) => veiculo.usuario)
+    @ApiProperty() 
+    veiculo: Veiculo[];
+
     @OneToMany(() => Viagem, (viagem) => viagem.usuario)
     @ApiProperty() 
-    viagem?: Viagem[]
+    viagem: Viagem[];
 
 }

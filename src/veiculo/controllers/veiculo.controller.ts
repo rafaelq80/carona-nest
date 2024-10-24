@@ -35,10 +35,10 @@ export class VeiculoController {
     return this.veiculoService.findById(id);
   }
 
-  @Get('/condutor/:condutor')
+  @Get('/modelo/:modelo')
   @HttpCode(HttpStatus.OK)
-  findByCondutor(@Param('condutor') condutor: string): Promise<Veiculo[]> {
-    return this.veiculoService.findByCondutor(condutor);
+  findByModelo(@Param('modelo') modelo: string): Promise<Veiculo[]> {
+    return this.veiculoService.findByModelo(modelo);
   }
 
   @Post()

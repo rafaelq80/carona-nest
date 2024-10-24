@@ -1,7 +1,7 @@
 ﻿import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, ILike, Repository } from 'typeorm';
-import { VeiculoService } from '../../veiculo/services/veiculo.service';
+import { UsuarioService } from '../../usuario/services/usuario.service';
 import { Viagem } from '../entities/viagem.entity';
 
 @Injectable()
@@ -9,13 +9,12 @@ export class ViagemService {
   constructor(
     @InjectRepository(Viagem)
     private viagemRepository: Repository<Viagem>,
-    private veiculoService: VeiculoService,
+    private usuarioService: UsuarioService,
   ) {}
 
   async findAll(): Promise<Viagem[]> {
     return await this.viagemRepository.find({
       relations: {
-        veiculo: true,
         usuario: true,
       },
     });
@@ -27,7 +26,6 @@ export class ViagemService {
         id,
       },
       relations: {
-        veiculo: true,
         usuario: true,
       },
     });
@@ -47,7 +45,6 @@ export class ViagemService {
         destino: ILike(`%${destino}%`),
       },
       relations: {
-        veiculo: true,
         usuario: true,
       },
     });
@@ -55,13 +52,13 @@ export class ViagemService {
 
   async create(viagem: Viagem): Promise<Viagem> {
 
-    if (!viagem.veiculo)
+    if (!viagem.usuario)
       throw new HttpException(
-        'Os dados do Veículo não foram informados!',
+        'Os dados do Usuário não foram informados!',
         HttpStatus.BAD_REQUEST,
       );
 
-    await this.veiculoService.findById(viagem.veiculo.id);
+    await this.usuarioService.findById(viagem.usuario.id);
 
     viagem.tempoEstimado = this.calcularTempoViagem(
       viagem.distancia,
@@ -82,13 +79,13 @@ export class ViagemService {
 
     await this.findById(viagem.id);
 
-    if (!viagem.veiculo)
+    if (!viagem.usuario)
       throw new HttpException(
-        'Os dados do Veículo não foram informados!',
+       'Os dados do Usuário não foram informados!',
         HttpStatus.BAD_REQUEST,
       );
 
-    await this.veiculoService.findById(viagem.veiculo.id);
+    await this.usuarioService.findById(viagem.usuario.id);
 
     viagem.tempoEstimado = this.calcularTempoViagem(
       viagem.distancia,
