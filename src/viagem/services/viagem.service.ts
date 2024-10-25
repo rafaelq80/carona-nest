@@ -1,7 +1,7 @@
 ﻿import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, ILike, Repository } from 'typeorm';
-import { UsuarioService } from '../../usuario/services/usuario.service';
+import { VeiculoService } from '../../veiculo/services/veiculo.service';
 import { Viagem } from '../entities/viagem.entity';
 
 @Injectable()
@@ -9,12 +9,13 @@ export class ViagemService {
   constructor(
     @InjectRepository(Viagem)
     private viagemRepository: Repository<Viagem>,
-    private usuarioService: UsuarioService,
+    private veiculoService: VeiculoService,
   ) {}
 
   async findAll(): Promise<Viagem[]> {
     return await this.viagemRepository.find({
       relations: {
+        veiculo: true,
         usuario: true,
       },
     });
@@ -26,6 +27,7 @@ export class ViagemService {
         id,
       },
       relations: {
+        veiculo: true,
         usuario: true,
       },
     });
@@ -45,6 +47,7 @@ export class ViagemService {
         destino: ILike(`%${destino}%`),
       },
       relations: {
+        veiculo: true,
         usuario: true,
       },
     });
@@ -52,13 +55,13 @@ export class ViagemService {
 
   async create(viagem: Viagem): Promise<Viagem> {
 
-    if (!viagem.usuario)
+    if (!viagem.veiculo)
       throw new HttpException(
-        'Os dados do Usuário não foram informados!',
+        'Os dados do Veículo não foram informados!',
         HttpStatus.BAD_REQUEST,
       );
 
-    await this.usuarioService.findById(viagem.usuario.id);
+    await this.veiculoService.findById(viagem.veiculo.id);
 
     viagem.tempoEstimado = this.calcularTempoViagem(
       viagem.distancia,
@@ -73,19 +76,19 @@ export class ViagemService {
     
     if (!viagem.id)
       throw new HttpException(
-        'A Viagem não foi encontrada!',
+        'Os dados da Viagem não foram informados!',
         HttpStatus.NOT_FOUND,
       );
 
     await this.findById(viagem.id);
 
-    if (!viagem.usuario)
+    if (!viagem.veiculo)
       throw new HttpException(
-       'Os dados do Usuário não foram informados!',
+       'Os dados do Veículo não foram informados!',
         HttpStatus.BAD_REQUEST,
       );
 
-    await this.usuarioService.findById(viagem.usuario.id);
+    await this.veiculoService.findById(viagem.veiculo.id);
 
     viagem.tempoEstimado = this.calcularTempoViagem(
       viagem.distancia,
@@ -108,7 +111,7 @@ export class ViagemService {
     const horas = Math.floor(tempoHoras);
     const minutos = Math.round((tempoHoras - horas) * 60);
 
-    if (horas === 0) return `${minutos} m`;
-    else return `${horas} h e ${minutos} m`;
+    if (horas === 0) return `${minutos} minutos`;
+    else return `${horas} horas e ${minutos} minutos`;
   }
 }

@@ -1,7 +1,6 @@
 ﻿import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, ILike, Repository } from 'typeorm';
-import { UsuarioService } from '../../usuario/services/usuario.service';
 import { Veiculo } from '../entities/veiculo.entity';
 
 @Injectable()
@@ -9,7 +8,6 @@ export class VeiculoService {
   constructor(
     @InjectRepository(Veiculo)
     private veiculoRepository: Repository<Veiculo>,
-    private usuarioService: UsuarioService,
   ) {}
 
   async findAll(): Promise<Veiculo[]> {
@@ -17,7 +15,7 @@ export class VeiculoService {
      return await this.veiculoRepository.find(
     {
       relations: {
-        usuario: true,
+        viagem: true,
       },
     }
     );
@@ -30,7 +28,7 @@ export class VeiculoService {
         id,
       },
       relations: {
-        usuario: true,
+        viagem: true,
       },
     });
 
@@ -46,42 +44,20 @@ export class VeiculoService {
         modelo: ILike(`%${modelo}%`),
       },
       relations: {
-        usuario: true,
+        viagem: true,
       },
     });
   }
 
   async create(veiculo: Veiculo): Promise<Veiculo> {
 
-    if (!veiculo.usuario)
-      throw new HttpException(
-        'Os dados do Usuário não foram informados!',
-        HttpStatus.BAD_REQUEST,
-      );
-
-    await this.usuarioService.findById(veiculo.usuario.id);
-
     return await this.veiculoRepository.save(veiculo);
 
   }
 
   async update(veiculo: Veiculo): Promise<Veiculo> {
-    
-     if (!veiculo.id)
-      throw new HttpException(
-        'Os dados do Veículo não foram informados!',
-        HttpStatus.NOT_FOUND,
-      );
 
     await this.findById(veiculo.id);
-
-    if (!veiculo.usuario)
-      throw new HttpException(
-        'Os dados do Usuário não foram informados!',
-        HttpStatus.BAD_REQUEST,
-      );
-
-    await this.usuarioService.findById(veiculo.usuario.id);
 
     return await this.veiculoRepository.save(veiculo);
   }

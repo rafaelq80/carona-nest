@@ -1,8 +1,8 @@
 ﻿import { ApiProperty } from "@nestjs/swagger"
 import { Transform, TransformFnParams } from "class-transformer"
-import { IsNotEmpty, IsPositive } from "class-validator"
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
-import { Usuario } from "../../usuario/entities/usuario.entity"
+import { IsNotEmpty } from "class-validator"
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { Viagem } from "../../viagem/entities/viagem.entity"
 
 @Entity({name: "tb_veiculos"})
 export class Veiculo {
@@ -25,12 +25,10 @@ export class Veiculo {
 
     @Column({length: 5000 }) 
     @ApiProperty() 
-    fotoVeiculo: string
+    foto: string
 
-    @ManyToOne(() => Usuario, (usuario) => usuario.veiculo, {
-        onDelete: "CASCADE"
-    })
-    @ApiProperty({ type: () => Usuario }) 
-    usuario: Usuario
+    @OneToMany(() => Viagem, (viagem) => viagem.usuario)
+    @ApiProperty() 
+    viagem: Viagem[]
 
 }

@@ -1,4 +1,4 @@
-# Projeto Carona Compartilhada
+# Projeto Carona Compartilhada - Backend
 
 <br />
 
@@ -9,7 +9,7 @@
 
 <br /><br />
 
-## 1. O que é um Sistema de Caronas Compartilhadas?
+## 1. Descrição
 
 Um sistema de caronas compartilhadas é uma plataforma que permite que pessoas que fazem trajetos semelhantes compartilhem viagens em um mesmo veículo. Este tipo de sistema tem vários benefícios:
 
@@ -19,6 +19,8 @@ Um sistema de caronas compartilhadas é uma plataforma que permite que pessoas q
 4. Promoção de interação social
 
 Normalmente, esses sistemas funcionam através de um aplicativo móvel ou plataforma web onde os usuários podem oferecer ou solicitar caronas, definindo rotas, horários e condições da viagem.
+
+------
 
 ## 2. Sobre esta API
 
@@ -35,7 +37,7 @@ Esta API foi desenvolvida utilizando NestJS para criar a estrutura básica de um
 
 O sistema calcula automaticamente o tempo estimado de viagem baseado na distância e velocidade média fornecidas. Este cálculo é realizado no serviço `ViagemService` e o resultado é armazenado no campo `tempoEstimado` da entidade `Viagem`.
 
-<br /><br />
+------
 
 ## 3. Diagrama de Classes
 
@@ -43,11 +45,9 @@ O sistema calcula automaticamente o tempo estimado de viagem baseado na distânc
 classDiagram
 class Veiculo {
   - id : number
-  - condutor : string
-  - fotoCondutor : string
   - modelo : string
   - placa : string
-  - fotoVeiculo : string
+  - foto : string
   - viagem : []Viagem
   + findAll()
   + findById(id : number)
@@ -58,7 +58,9 @@ class Veiculo {
 }
 class Viagem {
   - id : number
+  - partida : string
   - destino : string
+  - dataPartida: Date
   - valor : number
   - distancia: number
   - velocidadeMedia: number
@@ -77,6 +79,7 @@ class Usuario {
   - nome : string
   - usuario : string
   - senha : string
+  - celular : string
   - foto : string
   - viagem : []Viagem
   + findAll()
@@ -90,15 +93,17 @@ class UsuarioLogin{
   - nome : string
   - usuario : string
   - senha : string
+  - celular : string
   - foto : string
   - token : string
 }
-Veiculo --> Viagem
-Usuario --> Viagem
+Veiculo <-- Viagem
+Usuario <-- Viagem
 ```
 
 **Observações Importantes:**
 
+- Estamos partindo do princípio de que os carros pertencem a uma frota, que são selecionados pelos motoristas no momento da criação de uma carona, para simplificar a implementação do sistema
 - O método **calcularTempoViagem** deve atender a alguns requisitos:
   - Receber os parâmetros do tipo number **distancia e velocidade**
   - A distância deve ser expressa em **quilômetros (Km)**
@@ -106,19 +111,20 @@ Usuario --> Viagem
   - Para calcular o tempo, utilizamos a fórmula: *tempo = distancia / velocidade*
   - O resultado final deve ser expresso em horas e minutos
 
-<br /><br />
+------
 
 ## 4. Diagrama Entidade-Relacionamento (DER)
 
 
 
 <div align="center">
-    <img src="https://i.imgur.com/TrhERFv.png" title="source: imgur.com" />
+    <img src="https://i.imgur.com/Ir4Qqti.png" title="source: imgur.com" />
 </div>
 
 
 
-<br /><br />
+
+------
 
 ## 5. Tecnologias utilizadas
 
@@ -130,7 +136,7 @@ Usuario --> Viagem
 | **ORM**                       | TypeORM    |
 | **Banco de dados Relacional** | MySQL      |
 
-<br /><br />
+------
 
 ## 6. Configuração e Execução
 
@@ -138,3 +144,4 @@ Usuario --> Viagem
 2. Instale as dependências: `npm install`
 3. Configure o banco de dados no arquivo `app.module.ts`
 4. Execute a aplicação: `npm run start:dev`
+

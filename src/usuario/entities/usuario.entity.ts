@@ -41,12 +41,8 @@ export class Usuario {
     @ApiProperty() 
     foto: string
 
-    @OneToMany(() => Veiculo, (veiculo) => veiculo.usuario)
-    @ApiProperty() 
-    veiculo: Veiculo[];
-
     @OneToMany(() => Viagem, (viagem) => viagem.usuario)
     @ApiProperty() 
-    viagem: Viagem[];
+    viagem: Viagem[]
 
 }
