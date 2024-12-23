@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, ILike, Repository } from 'typeorm';
 import { VeiculoService } from '../../veiculo/services/veiculo.service';
 import { Viagem } from '../entities/viagem.entity';
+import { RotaService } from './rota.service';
 
 @Injectable()
 export class ViagemService {
@@ -10,6 +11,7 @@ export class ViagemService {
     @InjectRepository(Viagem)
     private viagemRepository: Repository<Viagem>,
     private veiculoService: VeiculoService,
+    private rotaService: RotaService,
   ) {}
 
   async findAll(): Promise<Viagem[]> {
@@ -63,10 +65,7 @@ export class ViagemService {
 
     await this.veiculoService.findById(viagem.veiculo.id);
 
-    viagem.tempoEstimado = this.calcularTempoViagem(
-      viagem.distancia,
-      viagem.velocidadeMedia,
-    );
+    await this.rotaService.calcularRota(viagem);
 
     return await this.viagemRepository.save(viagem);
 
@@ -90,10 +89,7 @@ export class ViagemService {
 
     await this.veiculoService.findById(viagem.veiculo.id);
 
-    viagem.tempoEstimado = this.calcularTempoViagem(
-      viagem.distancia,
-      viagem.velocidadeMedia,
-    );
+    await this.rotaService.calcularRota(viagem);
 
     return await this.viagemRepository.save(viagem);
   }
@@ -106,12 +102,4 @@ export class ViagemService {
     
   }
 
-  calcularTempoViagem(distancia: number, velocidade: number): string {
-    const tempoHoras = distancia / velocidade;
-    const horas = Math.floor(tempoHoras);
-    const minutos = Math.round((tempoHoras - horas) * 60);
-
-    if (horas === 0) return `${minutos} minutos`;
-    else return `${horas} horas e ${minutos} minutos`;
-  }
 }

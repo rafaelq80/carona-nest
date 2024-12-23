@@ -34,30 +34,42 @@ export class Viagem {
   @Column({ type: 'datetime', nullable: false })
   dataPartida: Date;
 
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @IsNotEmpty()
   @Column({
     type: 'decimal',
     precision: 10,
     scale: 2,
     transformer: new NumericTransformer(),
   })
+  @ApiProperty()
   valor: number;
 
-  @IsPositive()
-  @Column({ type: 'float', default: 1 })
+  @Column({ type: 'float', default: 0 })
+  @ApiProperty()
   distancia: number;
 
-  @IsPositive()
-  @Column({ type: 'float', default: 1 })
+  @Column({ type: 'float', default: 0 })
+  @ApiProperty()
   velocidadeMedia: number;
 
-  @Transform(({ value }: TransformFnParams) => value?.trim())
-  @IsNotEmpty()
-  @IsOptional()
-  @Column({ length: 255, nullable: false })
+  @Column({ type: 'float', default: 0 })
   @ApiProperty()
-  tempoEstimado: string;
+  tempoEstimado: number;
+  
+  @Column({ type: 'float', default: 0 })
+  @ApiProperty()
+  latitudePartida: number;
+
+  @Column({ type: 'float', default: 0 })
+  @ApiProperty()
+  longitudePartida: number;
+
+  @Column({ type: 'float', default: 0 })
+  @ApiProperty()
+  latitudeDestino: number;
+
+  @Column({ type: 'float', default: 0 })
+  @ApiProperty()
+  longitudeDestino: number;
 
   @ManyToOne(() => Veiculo, (veiculo) => veiculo.viagem, {
     onDelete: 'CASCADE',
