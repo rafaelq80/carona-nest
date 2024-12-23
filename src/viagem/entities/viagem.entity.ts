@@ -31,7 +31,7 @@ export class Viagem {
 
   @ApiProperty()
   @IsDateString()
-  @Column({ type: 'datetime', nullable: false })
+  @Column({ type: 'timestamp', precision: 3, nullable: false })
   dataPartida: Date;
 
   @Column({
