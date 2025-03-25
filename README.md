@@ -53,8 +53,9 @@ Para Calcular o o trajeto da viagem, utilizamos 2 APIs:
 Para calcular o tempo, utilizamos como base uma tabela com a velocidade média do trânsito da cidade de São Paulo, de acordo com a faixa de horário.
 
 Para calcular o valor da viagem, utilizamos a seguinte formula:
+
 $$
-\text{valor da viagem} = \text{tarifa\_base} + (\text{distancia\_km} \times \text{valor\_km}) + (\text{tempo\_estimado} \times \text{valor\_minuto}) + \text{seguro}
+\text{valor da viagem} = \text{tarifa base} + (\text{distancia km} \times \text{valor km}) + (\text{tempo estimado} \times \text{valor minuto}) + \text{seguro}
 $$
 
 - A tarifa base, o valor do KM, o valor do minuto e o seguro são valores fixados
