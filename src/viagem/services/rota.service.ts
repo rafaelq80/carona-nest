@@ -8,8 +8,6 @@ import { Coordenadas } from "../interfaces/coordenadas.interface"
 @Injectable()
 export class RotaService {
 	private static readonly logger = new Logger(RotaService.name)
-	private static readonly OPEN_CAGE_URL =
-		"https://api.opencagedata.com/geocode/v1/json?q=%s&key=%s&language=pt&format=json"
 	private static readonly OSRM_URL =
 		"http://router.project-osrm.org/route/v1/driving/%.6f,%.6f;%.6f,%.6f?overview=false"
 
@@ -77,11 +75,24 @@ export class RotaService {
 	private async getCoordenadas(endereco: string): Promise<Coordenadas> {
 		try {
 			await this.aplicarRateLimit()
-			const enderecoLimpo = this.removerNumero(endereco)
-			const url = RotaService.OPEN_CAGE_URL.replace(
-				"%s",
-				`${enderecoLimpo}, São Paulo - SP`,
-			).replace("%s", this.configService.get<string>("API_KEY"))
+			const apiKey = this.configService.get<string>("API_KEY")
+			if (!apiKey) {
+				throw new HttpException(
+					"API_KEY não configurada no ambiente",
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				)
+			}
+			const params = new URLSearchParams({
+				q: `${endereco}, São Paulo, SP, Brasil`,
+				city: "São Paulo",
+				state: "São Paulo",
+				countrycode: "br",
+				key: apiKey,
+				language: "pt",
+				format: "json",
+				limit: "5",
+			})
+			const url = `https://api.opencagedata.com/geocode/v1/json?${params.toString()}`
 
 			const { data } = await firstValueFrom(
 				this.httpService.get(url, {
@@ -89,13 +100,20 @@ export class RotaService {
 				}),
 			)
 
-			const location = data.results?.find(
-				(resultado) => resultado.components?.city?.toLowerCase() === "são paulo",
-			)
+			const location = data.results?.find((resultado) => {
+				const c = resultado.components
+				if (!c) return false
+				const municipio = (c.city ?? c.town ?? c.municipality ?? "").toLowerCase().trim()
+				return municipio === "são paulo" || municipio === "sao paulo"
+			})
 
 			if (!location) {
+				RotaService.logger.warn(
+					`Nenhum resultado em São Paulo para '${endereco}'. Componentes retornados: ` +
+					JSON.stringify(data.results?.map((r) => r.components).slice(0, 3)),
+				)
 				throw new HttpException(
-					`Endereço não encontrado: ${endereco}`,
+					`Endereço não encontrado em São Paulo: ${endereco}`,
 					HttpStatus.NOT_FOUND,
 				)
 			}
@@ -108,7 +126,12 @@ export class RotaService {
 			RotaService.logger.error(
 				`Erro ao obter coordenadas para '${endereco}': ${error.message}`,
 			)
-			throw new HttpException("Erro ao buscar coordenadas", HttpStatus.INTERNAL_SERVER_ERROR)
+			if (error instanceof HttpException) throw error
+			const status = error.response?.status
+			if (status === 401) {
+				throw new HttpException("API_KEY inválida ou não autorizada (OpenCage 401)", HttpStatus.INTERNAL_SERVER_ERROR)
+			}
+			throw new HttpException(`Erro ao buscar coordenadas: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR)
 		}
 	}
 
@@ -175,8 +198,4 @@ export class RotaService {
 		return new Date(dataHora).getDay() >= 6
 	}
 
-	private removerNumero(endereco: string): string {
-		const match = endereco.trim().match(/(.*?)[,\s]+\d+$/)
-		return match ? match[1] : endereco
-	}
 }
